@@ -119,7 +119,8 @@ public class Server {
                     clientSocket.close();
                     System.out.println("Client disconnected: " + clientSocket.getInetAddress());
                     broadcastCurrentClients();
-                } catch (IOException _) {
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }

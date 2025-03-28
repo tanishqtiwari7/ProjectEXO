@@ -35,14 +35,22 @@ public class MessageHandler {
         byte messageType = generalMessage;
         String senderUsername = Server.currentClients.get(sender).username;
         String message = new String(messageData);
+        Result result = getResult(message, senderUsername, packetType, messageType);
+        Server.broadcast(result.messagePacket());
+        System.out.println("Broadcasted message from " + senderUsername + ": " + result.message() + " of type " + messageType + " with packet type " + packetType);
+    }
+
+    private static Result getResult(String message, String senderUsername, byte packetType, byte messageType) {
         message = senderUsername + "x1W1x" + message;
         byte[] messagePacket = new byte[message.length() + 2];
         messagePacket[0] = packetType;
         messagePacket[1] = messageType;
         byte[] messageBytes = message.getBytes();
         System.arraycopy(messageBytes, 0, messagePacket, 2, messageBytes.length);
-        Server.broadcast(messagePacket);
-        System.out.println("Broadcasted message from " + senderUsername + ": " + message + " of type " + messageType + " with packet type " + packetType);
+        return new Result(message, messagePacket);
+    }
+
+    private record Result(String message, byte[] messagePacket) {
     }
 
     private static void handlePrivateMessage(byte[] messageData, UUID sender) {
@@ -54,14 +62,9 @@ public class MessageHandler {
         UUID recipient = Server.getUUIDFromUsername(recipientUsername);
         byte packetType = 1;
         byte messageType = privateMessage;
-        message = senderUsername + "x1W1x" + message;
-        byte[] messagePacket = new byte[message.length() + 2];
-        messagePacket[0] = packetType;
-        messagePacket[1] = messageType;
-        byte[] messageBytes = message.getBytes();
-        System.arraycopy(messageBytes, 0, messagePacket, 2, messageBytes.length);
-        Server.currentClients.get(recipient).clientHandler.sendPacket(messagePacket);
+        Result result = getResult(message, senderUsername, packetType, messageType);
+        Server.currentClients.get(recipient).clientHandler.sendPacket(result.messagePacket());
 
-        System.out.println("Sent private message from " + Server.currentClients.get(sender).username + " to " + recipientUsername + ": " + message);
+        System.out.println("Sent private message from " + Server.currentClients.get(sender).username + " to " + recipientUsername + ": " + result.message());
     }
 }
