@@ -1,0 +1,1 @@
+java -jar target/ProjectEXO-1.0-SNAPSHOT.jar
