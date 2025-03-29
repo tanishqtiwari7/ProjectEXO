@@ -184,13 +184,36 @@ public class Server {
                     .generatePublic(new X509EncodedKeySpec(receivedClientPublicKeyBytes));
         }
 
+
         public void sendPacket(byte[] bytes) {
             try {
+                // Calculate total number of chunks needed
+                int chunkSize = 350; // Adjust chunk size as needed
+                int totalChunks = (int) Math.ceil((double) bytes.length / chunkSize);
+
+                // Send header with total packet size and chunk count
                 cipher.init(Cipher.ENCRYPT_MODE, currentClients.get(uuid).publicKey);
-                byte[] encryptedBytes = cipher.doFinal(bytes);
-                outputStream.writeInt(encryptedBytes.length);
-                outputStream.write(encryptedBytes);
+                byte[] header = ("SIZE:" + bytes.length + ";CHUNKS:" + totalChunks).getBytes();
+                byte[] encryptedHeader = cipher.doFinal(header);
+                outputStream.writeInt(encryptedHeader.length);
+                outputStream.write(encryptedHeader);
                 outputStream.flush();
+
+                // Send each chunk
+                for (int i = 0; i < totalChunks; i++) {
+                    int start = i * chunkSize;
+                    int end = Math.min(bytes.length, start + chunkSize);
+                    int currentChunkSize = end - start;
+
+                    byte[] chunk = new byte[currentChunkSize];
+                    System.arraycopy(bytes, start, chunk, 0, currentChunkSize);
+
+                    cipher.init(Cipher.ENCRYPT_MODE, currentClients.get(uuid).publicKey);
+                    byte[] encryptedChunk = cipher.doFinal(chunk);
+                    outputStream.writeInt(encryptedChunk.length);
+                    outputStream.write(encryptedChunk);
+                    outputStream.flush();
+                }
             } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | IOException e) {
                 throw new RuntimeException(e);
             }
@@ -199,12 +222,31 @@ public class Server {
         public void startReceivingPacket() {
             try {
                 while (true) {
-                    int length = inputStream.readInt();
-                    byte[] bytes = new byte[length];
-                    inputStream.readFully(bytes);
+                    // Receive header
+                    int headerLength = inputStream.readInt();
+                    byte[] headerBytes = new byte[headerLength];
+                    inputStream.readFully(headerBytes);
                     cipher.init(Cipher.DECRYPT_MODE, keyPair.getPrivate());
-                    byte[] decryptedBytes = cipher.doFinal(bytes);
-                    System.out.println("Received packet from " + currentClients.get(uuid).username);
+                    byte[] decryptedHeader = cipher.doFinal(headerBytes);
+
+                    String header = new String(decryptedHeader);
+                    int totalSize = Integer.parseInt(header.split(";")[0].split(":")[1]);
+                    int totalChunks = Integer.parseInt(header.split(";")[1].split(":")[1]);
+
+                    // Receive all chunks
+                    ByteArrayOutputStream completePacket = new ByteArrayOutputStream();
+                    for (int i = 0; i < totalChunks; i++) {
+                        int chunkLength = inputStream.readInt();
+                        byte[] chunk = new byte[chunkLength];
+                        inputStream.readFully(chunk);
+                        cipher.init(Cipher.DECRYPT_MODE, keyPair.getPrivate());
+                        byte[] decryptedChunk = cipher.doFinal(chunk);
+                        completePacket.write(decryptedChunk);
+                    }
+
+                    byte[] decryptedBytes = completePacket.toByteArray();
+                    System.out.println("Received packet from " + currentClients.get(uuid).username +
+                            " (size: " + decryptedBytes.length + " bytes)");
                     PacketHandler.handlePacket(decryptedBytes, uuid);
                 }
             } catch (IOException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
@@ -213,7 +255,6 @@ public class Server {
                 stopClientSocket();
             }
         }
-
         private void stopClientSocket() {
             try {
                 clientSocket.close();
