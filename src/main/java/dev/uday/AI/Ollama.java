@@ -21,7 +21,7 @@ public class Ollama {
     private static final String model = "gemma3:1b";
     public static boolean isOllamaAvailable = false;
 
-    public static ConcurrentHashMap<UUID, CopyOnWriteArrayList<OllamaChatMessage>> chatHistory = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<UUID, ArrayList<OllamaChatMessage>> chatHistory = new ConcurrentHashMap<>();
     public static boolean init() {
         try {
             api = new OllamaAPI();
