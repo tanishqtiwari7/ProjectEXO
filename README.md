@@ -1,6 +1,7 @@
+
 # ProjectEXO - Secure Network Communications Server 🔒
 
-A robust server implementation for encrypted client-server communications with RSA encryption.
+A robust server implementation for encrypted client-server communications with RSA encryption and integrated AI capabilities.
 
 ## Features ✨
 
@@ -10,12 +11,29 @@ A robust server implementation for encrypted client-server communications with R
 - 🔒 Secure authentication system
 - 📡 Packet-based communication
 - 🌐 Client status broadcasting
+- 🤖 Integrated AI functionality using Ollama
 
 ## System Requirements 🖥️
 
 - Java 21 or higher
 - Maven 3.11+ (for building)
 - Any operating system that supports Java
+- Ollama running locally for AI functionality
+
+## AI Integration 🧠
+
+ProjectEXO integrates with Ollama to provide AI capabilities:
+
+- Uses gemma3:1b model by default
+- Maintains conversation history for each user
+- Handles AI prompts through the established secure connection
+- Supports context-aware responses
+
+### Setting Up Ollama
+
+1. Install Ollama from [ollama.ai](https://ollama.ai)
+2. Pull the required model: `ollama pull gemma3:1b`
+3. Ensure Ollama is running when starting ProjectEXO
 
 ## Building from Source 🛠️
 
@@ -72,6 +90,14 @@ java -jar target/ProjectEXO-1.0-SNAPSHOT.jar
 - Authentication verifies user credentials
 - Each client is handled in a separate thread
 - Encrypted packets are used for all communications
+- AI requests are processed and responses returned securely
+
+## Packet Types 📦
+
+The server handles different types of packets:
+- Type 1: Regular messages
+- Type 9: AI functionality
+  - Subtype 1: Text completion/chat
 
 ## Companion Project 🤝
 
