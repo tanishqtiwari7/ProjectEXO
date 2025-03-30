@@ -140,7 +140,6 @@ public class Server {
             length = inputStream.readInt();
             byte[] passwordBytes = new byte[length];
             inputStream.readFully(passwordBytes);
-            cipher.init(Cipher.DECRYPT_MODE, keyPair.getPrivate());
             byte[] decryptedPasswordBytes = cipher.doFinal(passwordBytes);
 
             username = new String(decryptedUsernameBytes);
