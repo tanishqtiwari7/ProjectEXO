@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -12,50 +13,99 @@
     <top>
         <VBox spacing="10" styleClass="header">
             <padding>
-                <Insets top="15" right="15" bottom="15" left="15"/>
+                <Insets top="20" right="20" bottom="15" left="20"/>
             </padding>
             <HBox alignment="CENTER_LEFT" spacing="20">
-                <Label text="ProjectEXO Server" styleClass="title-label"/>
+                <Label text="ProjectEXO Server" styleClass="title-label">
+                    <font>
+                        <Font name="System Bold" size="18"/>
+                    </font>
+                </Label>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="timeElapsedLabel" text="Time Elapsed: 00:00:00"/>
+                <Label fx:id="timeElapsedLabel" text="Time Elapsed: 00:00:00" styleClass="info-label"/>
             </HBox>
+            <Separator/>
             <HBox alignment="CENTER_LEFT" spacing="20">
-                <Label fx:id="serverInfoLabel" text="IP: 127.0.0.1 | Port: 2005"/>
+                <Label fx:id="serverInfoLabel" text="IP: 127.0.0.1 | Port: 2005" styleClass="info-label"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="currentModelLabel" text="Current Model: gemma3:1b"/>
+                <Label fx:id="currentModelLabel" text="Current Model: gemma3:1b" styleClass="info-label"/>
             </HBox>
         </VBox>
     </top>
 
     <center>
-        <SplitPane dividerPositions="0.5" orientation="VERTICAL">
-            <VBox spacing="10">
-                <padding>
-                    <Insets top="15" right="15" bottom="15" left="15"/>
-                </padding>
-                <Label text="Online Users" styleClass="section-header"/>
-                <ListView fx:id="onlineUsersListView" VBox.vgrow="ALWAYS"/>
-            </VBox>
-            <VBox spacing="10">
-                <padding>
-                    <Insets top="15" right="15" bottom="15" left="15"/>
-                </padding>
-                <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Label text="Available AI Models" styleClass="section-header"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Button fx:id="switchModelButton" text="Switch to Selected Model" styleClass="action-button"/>
-                </HBox>
-                <ListView fx:id="availableModelsListView" VBox.vgrow="ALWAYS"/>
-            </VBox>
-        </SplitPane>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <Tab text="Server Status">
+                <BorderPane>
+                    <center>
+                        <SplitPane orientation="HORIZONTAL">
+                            <VBox spacing="10" styleClass="panel">
+                                <padding>
+                                    <Insets top="15" right="15" bottom="15" left="15"/>
+                                </padding>
+                                <Label text="Online Users" styleClass="section-header">
+                                    <font>
+                                        <Font name="System Bold" size="14"/>
+                                    </font>
+                                </Label>
+                                <ListView fx:id="onlineUsersListView" VBox.vgrow="ALWAYS" styleClass="list-view"/>
+                            </VBox>
+                            <VBox spacing="10" styleClass="panel">
+                                <padding>
+                                    <Insets top="15" right="15" bottom="15" left="15"/>
+                                </padding>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <Label text="Registered Users" styleClass="section-header">
+                                        <font>
+                                            <Font name="System Bold" size="14"/>
+                                        </font>
+                                    </Label>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Button fx:id="refreshRegisteredUsersButton" text="Refresh" styleClass="action-button"/>
+                                </HBox>
+                                <ListView fx:id="registeredUsersListView" VBox.vgrow="ALWAYS" styleClass="list-view"/>
+                                <HBox alignment="CENTER_RIGHT" spacing="10">
+                                    <Button fx:id="registerUserButton" text="Register New User" styleClass="action-button"/>
+                                </HBox>
+                            </VBox>
+                        </SplitPane>
+                    </center>
+                </BorderPane>
+            </Tab>
+            <Tab text="AI Configuration">
+                <BorderPane>
+                    <center>
+                        <VBox spacing="15" styleClass="panel">
+                            <padding>
+                                <Insets top="15" right="15" bottom="15" left="15"/>
+                            </padding>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Label text="Available AI Models" styleClass="section-header">
+                                    <font>
+                                        <Font name="System Bold" size="14"/>
+                                    </font>
+                                </Label>
+                                <Region HBox.hgrow="ALWAYS"/>
+                            </HBox>
+                            <ListView fx:id="availableModelsListView" VBox.vgrow="ALWAYS" styleClass="list-view"/>
+                            <HBox alignment="CENTER_RIGHT" spacing="10">
+                                <Button fx:id="switchModelButton" text="Switch to Selected Model" styleClass="action-button"/>
+                            </HBox>
+                        </VBox>
+                    </center>
+                </BorderPane>
+            </Tab>
+        </TabPane>
     </center>
 
     <bottom>
-        <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="footer">
+        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="footer">
             <padding>
-                <Insets top="15" right="15" bottom="15" left="15"/>
+                <Insets top="10" right="20" bottom="10" left="20"/>
             </padding>
-            <Button fx:id="registerUserButton" text="Register New User" styleClass="action-button"/>
+            <Label text="ProjectEXO Server v1.0" styleClass="footer-text"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Hyperlink text="https://github.com/UdayKhare09/ProjectEXO"/>
         </HBox>
     </bottom>
 

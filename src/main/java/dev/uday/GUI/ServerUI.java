@@ -21,6 +21,7 @@ import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,13 +31,16 @@ public class ServerUI implements Initializable {
     @FXML private Label timeElapsedLabel;
     @FXML private ListView<String> onlineUsersListView;
     @FXML private ListView<String> availableModelsListView;
+    @FXML private ListView<String> registeredUsersListView;
     @FXML private Label serverInfoLabel;
     @FXML private Button registerUserButton;
     @FXML private Button switchModelButton;
+    @FXML private Button refreshRegisteredUsersButton;
     @FXML private Label currentModelLabel;
 
     private final ObservableList<String> onlineUsersList = FXCollections.observableArrayList();
     private final ObservableList<String> availableModelsList = FXCollections.observableArrayList();
+    private final ObservableList<String> registeredUsersList = FXCollections.observableArrayList();
     private Timeline timeUpdater;
     private final AtomicInteger secondsElapsed = new AtomicInteger(0);
 
@@ -45,6 +49,7 @@ public class ServerUI implements Initializable {
         // Initialize UI components
         onlineUsersListView.setItems(onlineUsersList);
         availableModelsListView.setItems(availableModelsList);
+        registeredUsersListView.setItems(registeredUsersList);
 
         // Set server info
         serverInfoLabel.setText("IP: "+Server.ip+" | Port: " + Server.PORT);
@@ -61,11 +66,17 @@ public class ServerUI implements Initializable {
         // Load AI models
         loadAvailableModels();
 
+        // Load registered users
+        updateRegisteredUsersList();
+
         // Register button action
         registerUserButton.setOnAction(event -> showRegisterUserDialog());
 
         // Switch model button action
         switchModelButton.setOnAction(event -> switchModel());
+
+        // Refresh registered users button action
+        refreshRegisteredUsersButton.setOnAction(event -> updateRegisteredUsersList());
     }
 
     private void updateCurrentModelLabel() {
@@ -103,6 +114,15 @@ public class ServerUI implements Initializable {
             onlineUsersList.clear();
             for (Client client : Clients.currentClients.values()) {
                 onlineUsersList.add(client.username + " (" + client.IP + ")");
+            }
+        });
+    }
+
+    private void updateRegisteredUsersList() {
+        Platform.runLater(() -> {
+            registeredUsersList.clear();
+            for (Map.Entry<String, String> entry : Clients.registeredClients.entrySet()) {
+                registeredUsersList.add(entry.getKey());
             }
         });
     }
@@ -204,9 +224,16 @@ public class ServerUI implements Initializable {
             return;
         }
 
-        // Add to registered clients
-        Clients.registeredClients.put(username, password);
-        showAlert("Registration Success", "User " + username + " has been registered successfully.");
+        // Save to file and add to registered clients
+        boolean saveSuccess = Clients.saveRegisteredUser(username, password);
+
+        if (saveSuccess) {
+            updateRegisteredUsersList(); // Refresh the list
+            showAlert("Registration Success", "User " + username + " has been registered successfully.\n" +
+                    "Saved to ~/.exo/server/known.txt");
+        } else {
+            showAlert("Registration Warning", "User " + username + " added to memory but could not be saved to file.");
+        }
     }
 
     private void showAlert(String title, String content) {

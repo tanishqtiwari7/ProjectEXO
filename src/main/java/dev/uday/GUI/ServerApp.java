@@ -1,5 +1,6 @@
 package dev.uday.GUI;
 
+import atlantafx.base.theme.CupertinoDark;
 import atlantafx.base.theme.PrimerDark;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -11,7 +12,7 @@ public class ServerApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+        Application.setUserAgentStylesheet(new CupertinoDark().getUserAgentStylesheet());
 
         // Load FXML
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ServerUI.fxml"));
