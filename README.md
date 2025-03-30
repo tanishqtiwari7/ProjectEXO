@@ -5,13 +5,14 @@ A robust server implementation for encrypted client-server communications with R
 
 ## Features ✨
 
-- 🔐 RSA encryption for secure data transmission
-- 👥 Multiple client connection support
-- 🔑 Key exchange protocol implementation
-- 🔒 Secure authentication system
-- 📡 Packet-based communication
-- 🌐 Client status broadcasting
+- 🔐 RSA 2048-bit encryption for secure data transmission
+- 👥 Multiple client connection handling with unique UUID assignment
+- 🔑 Secure key exchange protocol implementation
+- 🔒 Username/password authentication system
+- 📡 Chunked packet-based communication for large messages
+- 🌐 Real-time client status broadcasting
 - 🤖 Integrated AI functionality using Ollama
+- 🖥️ JavaFX-based server management interface
 
 ## System Requirements 🖥️
 
@@ -19,21 +20,34 @@ A robust server implementation for encrypted client-server communications with R
 - Maven 3.11+ (for building)
 - Any operating system that supports Java
 - Ollama running locally for AI functionality
+- 4GB+ RAM recommended
+- 100MB+ storage space
 
 ## AI Integration 🧠
 
 ProjectEXO integrates with Ollama to provide AI capabilities:
 
 - Uses gemma3:1b model by default
-- Maintains conversation history for each user
+- Maintains conversation history for each connected client
 - Handles AI prompts through the established secure connection
 - Supports context-aware responses
+- Allows switching between available models through the UI
 
 ### Setting Up Ollama
 
 1. Install Ollama from [ollama.ai](https://ollama.ai)
-2. Pull the required model: `ollama pull gemma3:1b`
+2. Pull the default model: `ollama pull gemma3:1b`
 3. Ensure Ollama is running when starting ProjectEXO
+
+## Server Management Interface 🖱️
+
+The server includes a JavaFX-based management interface that provides:
+
+- Real-time monitoring of connected clients
+- User registration management
+- AI model selection and configuration
+- Server status information
+- Time elapsed since server start
 
 ## Building from Source 🛠️
 
@@ -85,19 +99,38 @@ java -jar target/ProjectEXO-1.0-SNAPSHOT.jar
 ## How It Works 🧩
 
 - Server initializes and listens on port 2005
-- Client connections are assigned unique UUIDs
-- RSA key exchange establishes secure communications
-- Authentication verifies user credentials
-- Each client is handled in a separate thread
-- Encrypted packets are used for all communications
-- AI requests are processed and responses returned securely
+- Each client connection is assigned a unique UUID
+- Secure RSA key exchange establishes encrypted communications
+- Authentication verifies user credentials against stored username/password pairs
+- Each client is handled in a separate thread for concurrent connections
+- Packets are split into chunks for handling large messages
+- All communications are encrypted using RSA encryption
+- AI requests are processed through Ollama and responses returned securely
 
-## Packet Types 📦
+## Communication Protocol 📦
 
 The server handles different types of packets:
+- Type 0: Client status broadcasts
 - Type 1: Regular messages
+  - Subtype 0: General broadcast messages
+  - Subtype 1: Private messages
 - Type 9: AI functionality
   - Subtype 1: Text completion/chat
+
+## Security Implementation 🔐
+
+- 2048-bit RSA encryption for all communications
+- Unique key pairs for each client connection
+- Secure key exchange protocol
+- Password-based authentication
+- UUID-based client identification
+
+## User Management 👤
+
+- Users are stored in `~/.exo/server/known.txt`
+- Default users are created on first run
+- New users can be registered through the server interface
+- Passwords are stored in plaintext (consider implementing hashing in future versions)
 
 ## Companion Project 🤝
 
