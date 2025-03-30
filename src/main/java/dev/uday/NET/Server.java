@@ -9,6 +9,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.*;
@@ -19,13 +20,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
     private ServerSocket serverSocket;
-    private static final int PORT = 2005;
+    public static final int PORT = 2005;
     public static ConcurrentHashMap<UUID, Client> currentClients = Clients.currentClients;
     private static KeyPair keyPair;
+    public static String ip;
 
     public Server() {
         try {
             serverSocket = new ServerSocket(PORT);
+            ip = InetAddress.getLocalHost().getHostAddress();
             System.out.println("Server started on port " + PORT);
             keyPair = generateKeyPair();
 //            broadcastThread.start();

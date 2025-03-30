@@ -17,8 +17,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Ollama {
-    private static OllamaAPI api;
-    private static final String model = "gemma3:1b";
+    public static OllamaAPI api;
+    public static String model = "gemma3:1b";
     public static boolean isOllamaAvailable = false;
 
     public static ConcurrentHashMap<UUID, ArrayList<OllamaChatMessage>> chatHistory = new ConcurrentHashMap<>();
