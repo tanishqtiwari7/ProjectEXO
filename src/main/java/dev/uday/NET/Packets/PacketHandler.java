@@ -16,7 +16,11 @@ public class PacketHandler {
                 System.out.println("Handling message");
                 MessageHandler.handleMessage(packetData, sender);
                 break;
-
+            //Handle image
+            case 3:
+                System.out.println("Handling image");
+                ImageHandler.handleImagePacket(packetData, sender);
+                break;
             //Handle AI prompts
             case 9:
                 System.out.println("Handling AI prompt");

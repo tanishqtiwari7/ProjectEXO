@@ -81,7 +81,7 @@ public class Server {
     public static class ClientHandler extends Thread {
         private final Socket clientSocket;
         private final PublicKey publicKey;
-        private final UUID uuid;
+        public final UUID uuid;
         private final Cipher cipher;
         private DataInputStream inputStream;
         private DataOutputStream outputStream;
@@ -190,7 +190,7 @@ public class Server {
         public void sendPacket(byte[] bytes) {
             try {
                 // Calculate total number of chunks needed
-                int chunkSize = 350; // Adjust chunk size as needed
+                int chunkSize = 240; // Adjust chunk size as needed
                 int totalChunks = (int) Math.ceil((double) bytes.length / chunkSize);
 
                 // Send header with total packet size and chunk count
