@@ -20,12 +20,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
     private ServerSocket serverSocket;
-    public static final int PORT = 2005;
+    public static int PORT = 2005;
     public static ConcurrentHashMap<UUID, Client> currentClients = Clients.currentClients;
     private static KeyPair keyPair;
     public static String ip;
-
-    public Server() {
+    public static String serverName = "SoloLeveler";
+    public Server(int port) {
+        // port is not null then set the PORT equal to the port
+        if (port != 0) {
+            PORT = port;
+        }
         try {
             serverSocket = new ServerSocket(PORT);
             ip = InetAddress.getLocalHost().getHostAddress();
