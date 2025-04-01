@@ -150,4 +150,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License ⚖️
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/GPLv3_Logo.svg/2560px-GPLv3_Logo.svg.png" alt="alt text" width="200" height="100">
+
 This project is licensed under the [GNU General Public License v3 (GPLv3)](LICENSE).
