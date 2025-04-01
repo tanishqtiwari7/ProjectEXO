@@ -7,8 +7,8 @@ public class ServerBroadcasting implements Runnable {
 
     @Override
     public void run() {
-        try {
-            DatagramSocket datagramSocket = new DatagramSocket();
+        try (DatagramSocket datagramSocket = new DatagramSocket()) {
+
             datagramSocket.setBroadcast(true);
 
             // Prepare broadcast data
@@ -33,7 +33,6 @@ public class ServerBroadcasting implements Runnable {
 
             while (true) {
                 datagramSocket.send(broadcastPacket);
-                System.out.println("Broadcasting server information: " + ipAddress + ":" + port + " - " + serverName);
                 // Wait for 2 seconds before sending the next broadcast
                 Thread.sleep(2000);
             }

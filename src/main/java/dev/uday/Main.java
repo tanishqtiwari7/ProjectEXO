@@ -2,30 +2,27 @@ package dev.uday;
 
 import dev.uday.AI.Ollama;
 import dev.uday.GUI.ServerApp;
-import dev.uday.NET.Server;
-import dev.uday.NET.ServerBroadcasting;
+import dev.uday.Headless.HeadlessServer;
+
+import java.awt.*;
 
 public class Main {
     public static void main(String[] args) {
-        // Parse command-line arguments for port if provided
-        if (!(args.length == 0)) {
-            if (args[0].equals("-p")) {
-                if (args.length == 2) {
-                    try {
-                        Server.PORT = Integer.parseInt(args[1]);
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid port number. Will use configuration dialog.");
-                    }
-                }
-            }
-        }
 
         System.out.println("Starting ProjectEXO Server...");
 
         // Initialize Ollama
         Ollama.init();
 
-        // Launch the UI (will show splash screen then config dialog)
-        ServerApp.startServerApp();
+        // Check if machine is headless
+        boolean headless = GraphicsEnvironment.isHeadless();
+        String headlessProperty = System.getProperty("java.awt.headless");
+
+        if (headless || "true".equalsIgnoreCase(headlessProperty)) {
+            HeadlessServer.startHeadlessServer(args);
+        } else {
+            // Launch the UI (will show splash screen then config dialog)
+            ServerApp.startServerApp();
+        }
     }
 }
