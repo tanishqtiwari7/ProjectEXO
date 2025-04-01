@@ -3,6 +3,7 @@ package dev.uday.NET;
 import dev.uday.Client;
 import dev.uday.Clients;
 import dev.uday.NET.Packets.PacketHandler;
+import org.slf4j.Logger;
 
 import javax.crypto.*;
 import java.io.*;
@@ -22,18 +23,20 @@ public class Server {
     private static KeyPair keyPair;
     public static String ip;
     public static String serverName = "SoloLeveler";
+    Logger logger;
 
     public Server(int port) {
         if (port != 0) {
             PORT = port;
         }
         try {
+            logger = org.slf4j.LoggerFactory.getLogger(Server.class);
             serverSocket = new ServerSocket(PORT);
             ip = InetAddress.getLocalHost().getHostAddress();
-            System.out.println("Server started on port " + PORT);
+            logger.info("Server started on port: {}", PORT);
             keyPair = generateKeyPair();
         } catch (IOException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -50,17 +53,17 @@ public class Server {
         try {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Client connected: " + clientSocket.getInetAddress());
+                logger.info("Client connected: {}", clientSocket.getInetAddress());
                 UUID uuid = generateUniqueUUID();
                 currentClients.put(uuid, new Client(clientSocket, uuid));
-                System.out.println("UUID: " + uuid);
+                logger.info(uuid.toString());
 
                 ClientHandler clientHandler = new ClientHandler(clientSocket, keyPair.getPublic(), uuid);
                 currentClients.get(uuid).clientHandler = clientHandler;
                 clientHandler.start();
             }
         } catch (IOException | NoSuchPaddingException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } finally {
             stop();
         }
@@ -86,7 +89,7 @@ public class Server {
                 serverSocket.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -94,7 +97,6 @@ public class Server {
         for (Client client : currentClients.values()) {
             client.clientHandler.sendPacket(bytes);
         }
-        System.out.println("Broadcasted packet");
     }
 
     private static void broadcastCurrentClients() {
@@ -112,7 +114,6 @@ public class Server {
         bytes[0] = messageType;
         System.arraycopy(messageBytes, 0, bytes, 1, messageBytes.length);
         broadcast(bytes);
-        System.out.println("Broadcasted current clients");
     }
 
     public static class ClientHandler extends Thread {
@@ -124,16 +125,18 @@ public class Server {
         private DataOutputStream outputStream;
         public String username;
         public String password;
+        private Logger logger;
 
         public ClientHandler(Socket socket, PublicKey publicKey, UUID uuid) throws NoSuchPaddingException, NoSuchAlgorithmException {
             this.clientSocket = socket;
             this.publicKey = publicKey;
             this.uuid = uuid;
+            logger = org.slf4j.LoggerFactory.getLogger(ClientHandler.class);
             try {
                 inputStream = new DataInputStream(clientSocket.getInputStream());
                 outputStream = new DataOutputStream(clientSocket.getOutputStream());
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
             cipher = Cipher.getInstance("RSA");
         }
@@ -147,7 +150,7 @@ public class Server {
                 startReceivingPacket();
             } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException | IllegalBlockSizeException |
                      BadPaddingException | InvalidKeyException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             } finally {
                 closeClientSocket();
             }
@@ -156,8 +159,6 @@ public class Server {
         private void auth() throws IOException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
             username = decryptData(inputStream);
             password = decryptData(inputStream);
-            System.out.println("Username: " + username);
-            System.out.println("Password: " + password);
 
             if (Clients.registeredClients.containsKey(username)) {
                 if (isClientLoggedIn(username)) {
@@ -166,7 +167,7 @@ public class Server {
                 } else if (Clients.registeredClients.get(username).equals(password)) {
                     outputStream.writeInt(1);
                     currentClients.get(uuid).username = username;
-                    System.out.println("Client logged in: " + username);
+                    logger.info("User {} logged in", username);
                 } else {
                     outputStream.writeInt(2);
                     closeClientSocket();
@@ -224,7 +225,7 @@ public class Server {
                     outputStream.flush();
                 }
             } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
 
@@ -243,12 +244,10 @@ public class Server {
                     }
 
                     byte[] decryptedBytes = completePacket.toByteArray();
-                    System.out.println("Received packet from " + currentClients.get(uuid).username +
-                            " (size: " + decryptedBytes.length + " bytes)");
                     PacketHandler.handlePacket(decryptedBytes, uuid);
                 }
             } catch (IOException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             } finally {
                 closeClientSocket();
             }
@@ -269,7 +268,7 @@ public class Server {
                 broadcastCurrentClients();
                 this.interrupt();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
 
@@ -284,7 +283,7 @@ public class Server {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
     });
