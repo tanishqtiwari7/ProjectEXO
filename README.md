@@ -136,6 +136,9 @@ The server handles different types of packets:
 
 This server works with the [ProjectEXO Client](https://github.com/UdayKhare09/ProjectEXO_Client) application.
 
+## Team Members
+[Tanishq Tiwari](https://github.com/tanishqtiwari7)
+
 ## Contributing 💡
 
 Contributions are welcome! Please feel free to submit a Pull Request.
