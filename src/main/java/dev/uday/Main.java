@@ -15,16 +15,17 @@ public class Main {
         // Initialize Ollama
         Ollama.init();
 
-        // Check if machine is headless
-        boolean headless = GraphicsEnvironment.isHeadless();
-        String headlessProperty = System.getProperty("java.awt.headless");
-
-        if (headless || "true".equalsIgnoreCase(headlessProperty)) {
-            HeadlessServer.startHeadlessServer(args);
-        } else if (Objects.equals(args[0], "headless")) {
-            String[] args2 = new String[args.length - 1];
-            System.arraycopy(args, 1, args2, 0,args.length - 1);
-            HeadlessServer.startHeadlessServer(args2);
+        if (args.length > 0) {
+            if (Objects.equals(args[0], "headless")) {
+                String[] args2 = new String[args.length - 1];
+                System.arraycopy(args, 1, args2, 0, args.length - 1);
+                HeadlessServer.startHeadlessServer(args2);
+            } else if (Objects.equals(args[0], "gui")) {
+                // Launch the UI (will show splash screen then config dialog)
+                EventQueue.invokeLater(ServerApp::startServerApp);
+            } else {
+                System.out.println("Invalid argument. Use 'headless' or 'gui'.");
+            }
         } else {
             // Launch the UI (will show splash screen then config dialog)
             ServerApp.startServerApp();

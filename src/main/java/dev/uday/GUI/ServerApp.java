@@ -23,11 +23,9 @@ import javafx.stage.StageStyle;
 
 import java.net.URL;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ServerApp extends Application {
     private Stage mainStage;
-    private static final AtomicBoolean configProcessed = new AtomicBoolean(false);
 
     @Override
     public void start(Stage stage) {
@@ -86,6 +84,7 @@ public class ServerApp extends Application {
                 System.out.println("Media player ready, duration: " + media.getDuration());
                 // Show the splash screen only when media is ready
                 splashStage.show();
+                splashStage.setAlwaysOnTop(true);
                 mediaPlayer.play();
             });
 
